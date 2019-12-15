@@ -122,27 +122,16 @@ vfs_read_file(struct vfs_instance *i, char *file_name, char *folder_name)
     printf("Entries = %d\n", f->file_entries);
     for (j = 0; j < f->file_entries; j++) {
         if (memcmp(file_name, tmp->file_name, strlen(file_name)) == 0) {
-            vfs_print_vfs_entry_info(tmp);
+            vfs_print_entry_info(tmp);
             break;
         }
         tmp = tmp->next;
     }
 }
 
-VFS_API void
-vfs_print_files(struct vfs_instance *i, char *folder_name)
-{
-    int j;
-    struct vfs_entry *v;
-    v = i->folders->files;
-    for (j = 0; j < i->folders->file_entries; j++) {
-        printf("%s %p\n", v->file_name, v);
-        v = v->next;
-    }
-}
 
 VFS_API void
-vfs_print_vfs_entry_info(struct vfs_entry *e)
+vfs_print_entry_info(struct vfs_entry *e)
 {
     printf("--------------------------------------\n");
     printf("file name: %s\n", e->file_name);
@@ -150,4 +139,96 @@ vfs_print_vfs_entry_info(struct vfs_entry *e)
     printf("data len : %d\n", e->data_len);
     printf("folder name: %s\n", e->folder_name);
     printf("--------------------------------------\n");
+}
+
+VFS_API void
+vfs_delete_file(struct vfs_instance *i, char *file_name, char *folder_name)
+{
+    assert(i);
+    assert(file_name);
+    assert(folder_name);
+    int j;
+    struct vfs_folder *f;
+    struct vfs_entry *e, *last;
+    f = NULL;
+    for (j = 0; j < i->folder_num; j++) {
+        f = i->folders;
+        if (memcmp(folder_name, f->name, strlen(f->name)) == 0) {
+            break;
+        }
+
+    }
+    if (f == NULL) {
+        err;
+        abort();
+    }
+    e = f->files;
+    last = e;
+    for (j = 0; j < f->file_entries; j++) {
+        if (memcmp(file_name, e->file_name, strlen(file_name)) == 0) {
+            printf("Found entry\n");
+            if (f->files == e) {
+                printf("Our entry is at the head\n");
+                f->files = e->next;
+            } else {
+                last->next = e->next;
+            }
+            free(e->file_name);
+            free(e->file_data);
+            free(e->folder_name);
+            free(e);
+            f->file_entries--;
+            break;
+        }
+        last = e;
+        e = e->next;
+    }
+    printf("f entries = %d\n", f->file_entries);
+}
+
+
+VFS_API void
+vfs_print_folder_files(struct vfs_instance *i, char *folder_name)
+{
+    assert(i);
+    assert(folder_name);
+    int j;
+    struct vfs_folder *f;
+    struct vfs_entry *e;
+    printf("Printing %s files\n", folder_name);
+    f = i->folders;
+    for (j = 0; j < i->folder_num; j++) {
+        if (memcmp(folder_name, f->name, strlen(f->name)) == 0) {
+            e = f->files;
+            for (j = 0; j < f->file_entries; j++) {
+                vfs_print_entry_info(e);
+                e = e->next;
+
+            }
+            break;
+        }
+        f = f->next;
+
+    }
+    printf("--------------------------------\n");
+}
+
+VFS_API void
+vfs_new_folder(struct vfs_instance *i, char *folder_name)
+{
+    assert(i);
+    assert(folder_name);
+    struct vfs_folder *f, *tmp;
+    int j;
+    tmp = i->folders;
+    i->folders = vfs_create_folder(folder_name);
+    i->folders->next = tmp;
+    i->folder_num++;
+    f = i->folders;
+    for (j = 0; j < i->folder_num; j++) {
+        printf("Fodler %s\n", f->name);
+        f = f->next;
+
+    }
+
 }

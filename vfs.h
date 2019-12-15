@@ -27,12 +27,12 @@ struct vfs_entry {
 };
 VFS_API struct vfs_instance *vfs_setup(void);
 VFS_API struct vfs_folder *vfs_create_folder(char *folder_name);
-VFS_API void vfs_ls_folder(struct vfs_instance *i, char *folder_name);
+VFS_API void vfs_new_folder(struct vfs_instance *i, char *folder_name); 
+VFS_API void vfs_print_folder_files(struct vfs_instance *i, char *folder_name);
 VFS_API void vfs_store_file_root(struct vfs_instance *i, char *file_name, void *data, int len);
 VFS_API void vfs_store_file(struct vfs_instance *i, char *file_name, char *folder_name, void *data, int len);
 VFS_API void vfs_delete_file(struct vfs_instance *i, char *file_name, char *folder_name);
 VFS_API void vfs_read_file(struct vfs_instance *i, char *file_name, char *folder_name);
-VFS_API void vfs_print_files(struct vfs_instance *i, char *folder_name);
-VFS_API void vfs_print_vfs_entry_info(struct vfs_entry *e);
+VFS_API void vfs_print_entry_info(struct vfs_entry *e);
 
 #endif
